@@ -10,7 +10,7 @@ import os
 from typing import List, Tuple, Optional, Dict
 from . import kcm_file
 
-def export_kcm(context, filepath: str, export_textures: bool = True) -> set:
+def export_kcm(context, filepath: str, export_textures: bool = True, encrypt: bool = True) -> set:
     """Export selected terrain object to KCM file"""
     
     # Get active object
@@ -25,7 +25,7 @@ def export_kcm(context, filepath: str, export_textures: bool = True) -> set:
         return {'CANCELLED'}
     
     # Write KCM file
-    if not kcm.write(filepath):
+    if not kcm.write(filepath, encrypt=encrypt):
         print("Failed to write KCM file")
         return {'CANCELLED'}
     

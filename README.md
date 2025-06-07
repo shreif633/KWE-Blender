@@ -9,6 +9,7 @@ A powerful Blender addon for importing, editing, and exporting KalOnline MMORPG 
 - **Export KCM files** - Save Blender terrain back to KalOnline format
 - **Real texture display** - View actual game textures in Blender viewport
 - **Heightmap support** - Export terrain as heightmap images
+- **Encryption support** - Handle encrypted KCM files with CRC validation
 
 ### 🎨 Texture Management
 - **Texture browser** - Browse and preview available game textures
@@ -68,6 +69,7 @@ A powerful Blender addon for importing, editing, and exporting KalOnline MMORPG 
 KWE-Blender/
 ├── __init__.py              # Main addon entry point
 ├── kcm_file.py             # KCM file format handler
+├── util.py                 # Encryption/decryption and CRC utilities
 ├── terrain_importer.py     # Terrain import functionality
 ├── terrain_exporter.py     # Terrain export functionality
 ├── texture_manager.py      # Texture loading and management
@@ -115,6 +117,28 @@ Tile Data (32 bytes per tile)
 │   ├── UV U: float (4 bytes)
 │   └── UV V: float (4 bytes)
 ```
+
+## Encryption System
+
+KalOnline uses a proprietary encryption system for protecting game files. The addon includes full support for this encryption:
+
+### Encryption Features
+- **Automatic Detection** - Detects if KCM files are encrypted
+- **CRC32 Validation** - Verifies file integrity with checksums
+- **Transparent Handling** - Automatically encrypts/decrypts during import/export
+- **Original Algorithm** - Uses the exact encryption from the original game
+
+### Encryption Process
+1. **CRC Calculation** - Calculate CRC32 of original data
+2. **CRC Prepending** - Add CRC to beginning of data
+3. **XOR Encryption** - Apply XOR cipher with rolling key
+4. **File Writing** - Save encrypted data to disk
+
+### Security Notes
+- The encryption is for game file protection, not security
+- Original algorithm preserved exactly as in Delphi 7 source
+- CRC validation ensures file integrity
+- Encryption key: 0x5A (default for KCM files)
 
 ## N.ENV Texture List Format
 

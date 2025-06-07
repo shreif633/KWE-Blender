@@ -68,9 +68,15 @@ class ExportKCM(bpy.types.Operator, ExportHelper):
         description="Export texture file references",
         default=True,
     )
-    
+
+    encrypt_file: BoolProperty(
+        name="Encrypt File",
+        description="Encrypt KCM file with KalOnline encryption",
+        default=True,
+    )
+
     def execute(self, context):
-        return terrain_exporter.export_kcm(context, self.filepath, self.export_textures)
+        return terrain_exporter.export_kcm(context, self.filepath, self.export_textures, self.encrypt_file)
 
 # Menu functions
 def menu_func_import(self, context):

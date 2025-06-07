@@ -47,7 +47,8 @@ def create_addon_zip():
     addon_files = [
         "__init__.py",
         "kcm_file.py",
-        "terrain_importer.py", 
+        "util.py",
+        "terrain_importer.py",
         "terrain_exporter.py",
         "texture_manager.py",
         "ui_panels.py",
@@ -87,7 +88,8 @@ def install_addon():
     # Copy addon files
     addon_files = [
         "__init__.py",
-        "kcm_file.py", 
+        "kcm_file.py",
+        "util.py",
         "terrain_importer.py",
         "terrain_exporter.py",
         "texture_manager.py",

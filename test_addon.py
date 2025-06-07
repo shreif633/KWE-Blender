@@ -12,20 +12,53 @@ addon_path = os.path.dirname(__file__)
 if addon_path not in sys.path:
     sys.path.append(addon_path)
 
+def test_encryption_functions():
+    """Test encryption/decryption functions"""
+    print("Testing encryption functions...")
+
+    try:
+        from util import encrypt_data, decrypt_data, calculate_crc32, encrypt_file_data, decrypt_file_data
+
+        # Test basic encryption/decryption
+        test_data = b"Hello KalOnline World!"
+        encrypted = encrypt_data(test_data)
+        decrypted = decrypt_data(encrypted)
+
+        if decrypted == test_data:
+            print("✓ Basic encryption/decryption successful")
+        else:
+            print("✗ Basic encryption/decryption failed")
+
+        # Test CRC calculation
+        crc = calculate_crc32(test_data)
+        print(f"✓ CRC32 calculated: {crc:08X}")
+
+        # Test file encryption with CRC
+        encrypted_file = encrypt_file_data(test_data, use_crc=True)
+        decrypted_file = decrypt_file_data(encrypted_file, use_crc=True)
+
+        if decrypted_file == test_data:
+            print("✓ File encryption/decryption with CRC successful")
+        else:
+            print("✗ File encryption/decryption with CRC failed")
+
+    except Exception as e:
+        print(f"✗ Encryption test failed: {e}")
+
 def test_kcm_file_format():
     """Test KCM file format reading/writing"""
-    print("Testing KCM file format...")
-    
+    print("\nTesting KCM file format...")
+
     try:
         from kcm_file import KCMFile, KCMTexture, KCMTile
-        
+
         # Create test terrain
         kcm = KCMFile()
         kcm.create_empty_terrain(4, 4, 32)
-        
+
         # Add test texture
         texture_id = kcm.add_texture("test_grass.dds", 256, 256, "DDS")
-        
+
         # Set some tile data
         for y in range(4):
             for x in range(4):
@@ -34,24 +67,38 @@ def test_kcm_file_format():
                 tile.texture_id = texture_id
                 tile.uv_u = x / 4.0
                 tile.uv_v = y / 4.0
-        
-        # Test write/read
-        test_file = "/tmp/test_terrain.kcm"
-        if kcm.write(test_file):
-            print("✓ KCM write successful")
-            
+
+        # Test encrypted write/read
+        test_file = "/tmp/test_terrain_encrypted.kcm"
+        if kcm.write(test_file, encrypt=True):
+            print("✓ KCM encrypted write successful")
+
             # Test read
             kcm2 = KCMFile()
             if kcm2.read(test_file):
-                print("✓ KCM read successful")
+                print("✓ KCM encrypted read successful")
                 print(f"  Dimensions: {kcm2.header.width}x{kcm2.header.height}")
                 print(f"  Textures: {len(kcm2.textures)}")
                 print(f"  First tile height: {kcm2.tiles[0][0].height}")
             else:
-                print("✗ KCM read failed")
+                print("✗ KCM encrypted read failed")
         else:
-            print("✗ KCM write failed")
-            
+            print("✗ KCM encrypted write failed")
+
+        # Test unencrypted write/read
+        test_file_plain = "/tmp/test_terrain_plain.kcm"
+        if kcm.write(test_file_plain, encrypt=False):
+            print("✓ KCM unencrypted write successful")
+
+            # Test read
+            kcm3 = KCMFile()
+            if kcm3.read(test_file_plain):
+                print("✓ KCM unencrypted read successful")
+            else:
+                print("✗ KCM unencrypted read failed")
+        else:
+            print("✗ KCM unencrypted write failed")
+
     except Exception as e:
         print(f"✗ KCM test failed: {e}")
 
@@ -191,13 +238,14 @@ def run_all_tests():
     print("=" * 50)
     print("KWE-Blender Addon Test Suite")
     print("=" * 50)
-    
+
+    test_encryption_functions()
     test_kcm_file_format()
     test_texture_manager()
     test_terrain_creation()
     test_addon_registration()
     create_sample_terrain()
-    
+
     print("\n" + "=" * 50)
     print("Test suite completed!")
     print("Check the console output for results.")
